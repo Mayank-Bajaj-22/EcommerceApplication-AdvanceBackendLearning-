@@ -22,7 +22,9 @@ app.get('/health-check', (req: Request, res: Response) => {
 });
 
 import authRouter from "./modules/auth/auth.route.js";
+import categoryRouter from "./modules/category/category.route.js";
 
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/category", categoryRouter);
 
 app.use(globalErrorHandler);

@@ -30,3 +30,23 @@ export const verifyUser = (req: Request, res: Response, next: NextFunction) => {
         next(new AppError("Invalid or expired token", 401));
     }
 };
+
+export const verifySeller = (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user;
+
+    if (user.role !== "SELLER") {
+        throw new AppError("You are not authorized.", 401);
+    }
+
+    next();
+};
+
+export const verifyAdmin = (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user;
+
+    if (user.role !== "ADMIN") {
+        throw new AppError("You are not authorized.", 401);
+    }
+
+    next();
+};
