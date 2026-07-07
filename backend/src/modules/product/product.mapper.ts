@@ -1,0 +1,15 @@
+import { Product } from "@prisma/client";
+
+export const toProductResponse = (product: Product) => {
+    return {
+        id: product.id,
+        productName: product.productName,
+        productDescription: product.productDescription,
+        productImageUrls: product.productImagesUrls,
+        price: product.price,
+        stock: product.stock,
+        isActive: product.isActive,
+        createdAt: product.createdAt,
+        updatedAt: product.updatedAt,
+    }
+}
