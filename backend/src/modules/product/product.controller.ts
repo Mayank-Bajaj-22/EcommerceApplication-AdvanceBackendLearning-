@@ -20,3 +20,48 @@ export const createProductController = CatchAsync(
         });
     },
 );
+
+export const getAllProductsController = CatchAsync(
+    async (req: Request, res: Response) => {
+        const result = await productService.getAllProducts();
+
+        sendResponse(res, 200, {
+            success: true,
+            message: "All Products fetched successfully",
+            data: result,
+        });
+    },
+);
+
+export const getProductsByCategoryController = CatchAsync(
+    async (req: Request, res: Response) => {
+        const categoryId = req.params.catId as string;
+
+        const result = await productService.getProductsByCategory(categoryId);
+
+        sendResponse(res, 200, {
+            success: true,
+            message: "All Products fetched by Category successfully",
+            data: result,
+        });
+    },
+);
+
+export const editProductController = CatchAsync(
+    async (req: Request, res: Response) => {
+        const productId = req.params.prodId as string;
+        const sellerId = req.user.id as string;
+
+        const result = await productService.editProduct(
+            req.body,
+            productId,
+            sellerId,
+        );
+
+        sendResponse(res, 200, {
+            success: true,
+            message: "Product edited successfully",
+            data: result,
+        });
+    },
+);
