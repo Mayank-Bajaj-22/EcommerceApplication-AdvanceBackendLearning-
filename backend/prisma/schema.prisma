@@ -125,6 +125,10 @@ model OrderItems {
   id                  String              @id @default(uuid())
   orderId             String
   productId           String
+
+  productName         String
+  productImageUrl     String
+
   quantity            Int
   priceAtPurchase     Decimal             @db.Decimal(10,2)
   createdAt           DateTime            @default(now())

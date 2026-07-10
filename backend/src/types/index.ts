@@ -1,3 +1,5 @@
+import { Prisma } from "@prisma/client";
+
 export type ApiResponse<T> = {
     success: boolean;
     message: string;
@@ -12,4 +14,18 @@ export interface IJwtPayload {
     updatedAt: Date,
 }
 
-// export 
+export type ProductQueryOptions = {
+    categoryId?: string,
+    minPrice?: string,
+    maxPrice?: string,
+    sortBy?: "latest" | "oldest" | "priceAsc" | "priceDesc",
+    limit?: number,
+    cursor?: string,
+};
+
+export type OrderWithRelations = Prisma.OrderGetPayload<{
+    include: {
+        items: true;
+        orderAddress: true;
+    };
+}>;

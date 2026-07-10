@@ -33,6 +33,28 @@ export const getAllProductsController = CatchAsync(
     },
 );
 
+export const getAllActiveProductController = CatchAsync(
+    async (req: Request, res: Response) => {
+        const filters = {
+            categoryId: req.query.categoryId as string,
+            minPrice: req.query.minPrice as string,
+            maxPrice: req.query.maxPrice as string,
+            sortBy: req.query.sortBy as any,
+
+            limit: req.query.limit ? Number(req.query.limit) : 10,
+            cursor: req.query.cursor as string,
+        }
+
+        const result = await productService.getAllActiveProducts(filters);
+
+        sendResponse(res, 200, {
+            success: true,
+            message: "Products fetched successfully",
+            data: result,
+        });
+    },
+);
+
 export const getProductsByCategoryController = CatchAsync(
     async (req: Request, res: Response) => {
         const categoryId = req.params.catId as string;
@@ -62,6 +84,38 @@ export const editProductController = CatchAsync(
             success: true,
             message: "Product edited successfully",
             data: result,
+        });
+    },
+);
+
+export const toggleActiveProductController = CatchAsync(
+    async (req: Request, res: Response) => {
+        const productId = req.params.prodId as string;
+        const sellerId = req.user.id as string;
+
+        const result = await productService.toggleActiveProduct(
+            productId,
+            sellerId,
+        );
+
+        sendResponse(res, 200, {
+            success: true,
+            message: "Product's active status toggled successfully.",
+            data: result,
+        });
+    },
+);
+
+export const deleteProductController = CatchAsync(
+    async (req: Request, res: Response) => {
+        const sellerId = req.user.id as string;
+        const productId = req.params.prodId as string;
+
+        await productService.deleteProduct(productId, sellerId);
+
+        sendResponse(res, 200, {
+            success: true,
+            message: "Product deleted successfully",
         });
     },
 );

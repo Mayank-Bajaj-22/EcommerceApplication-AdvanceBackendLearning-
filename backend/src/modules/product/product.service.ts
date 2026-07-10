@@ -1,9 +1,10 @@
 import { Prisma } from "@prisma/client";
 import { AppError } from "../../utils/AppError.js";
-import { uploadToCloudinary } from "../../utils/cloudinary.helper.js";
+import { deleteFromCloudinary, uploadToCloudinary } from "../../utils/cloudinary.helper.js";
 import { IProductRepository } from "./product.interface.js";
 import { createProductDTO, editProductDTO } from "./product.schema.js";
 import { toProductListResponse, toProductResponse } from "./product.mapper.js";
+import { ProductQueryOptions } from "../../types/index.js";
 
 export class ProductService {
     constructor(private productRepo: IProductRepository) {}
@@ -86,5 +87,61 @@ export class ProductService {
         }
 
         return toProductResponse(editedProduct);
+    }
+
+    async toggleActiveProduct(productId: string, sellerId: string) {
+        const exisitingProduct = await this.productRepo.findProductByIdAndSellerId(
+            productId,
+            sellerId,
+        );
+
+        if (!exisitingProduct) {
+            throw new AppError(
+                "Product not found or you are not authorized to perform this action",
+                401,
+            );
+        }
+
+        const updatedProduct = await this.productRepo.toggleActiveProduct(
+            productId,
+            sellerId,
+            !exisitingProduct.isActive,
+        );
+
+        return toProductResponse(updatedProduct);
+    }
+
+    async getAllActiveProducts(filters: ProductQueryOptions) {
+        const result = await this.productRepo.getAllActiveProducts(filters);
+
+        const formattedResult = {
+            products: toProductListResponse(result.products),
+            nextCursor: result.nextCursor,
+            hasMore: result.hasMore,
+        };
+
+        return formattedResult;
+    }
+
+    async deleteProduct(productId: string, sellerId: string) {
+        const existingProduct = await this.productRepo.findProductByIdAndSellerId(
+            productId, 
+            sellerId,
+        );
+
+        if (!existingProduct) {
+            throw new AppError(
+                "Product not found or you are not authorized to perform this action.",
+                401,
+            );
+        }
+
+        const productImageUrls = existingProduct.productImagesUrls;
+
+        productImageUrls.forEach(async (productImageUrls) => {
+            await deleteFromCloudinary(productImageUrls);
+        })
+
+        await this.productRepo.deleteProduct(productId, sellerId);
     }
 }
