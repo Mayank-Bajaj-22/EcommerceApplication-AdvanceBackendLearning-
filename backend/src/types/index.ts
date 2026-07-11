@@ -29,3 +29,13 @@ export type OrderWithRelations = Prisma.OrderGetPayload<{
         orderAddress: true;
     };
 }>;
+
+export type CartWithItems = Prisma.CartGetPayload<{
+    include: {
+        items: {
+            include: {
+                product: true;
+            };
+        };
+    };
+}>;
