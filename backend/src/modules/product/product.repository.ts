@@ -2,6 +2,7 @@ import { Prisma, Product } from "@prisma/client";
 import { IProductRepository } from "./product.interface.js";
 import { prisma } from "../../lib/prisma.js";
 import { ProductQueryOptions } from "../../types/index.js";
+import { AppError } from "../../utils/AppError.js";
 
 export class ProductRepository implements IProductRepository {
     async createProduct(data: {
@@ -176,6 +177,47 @@ export class ProductRepository implements IProductRepository {
             where: {
                 id: productId, 
                 userId: sellerId,
+            },
+        });
+    }
+
+    async decreaseStock(tx: Prisma.TransactionClient, productId: string, quantity: number): Promise<void> {
+        const result = await tx.product.updateMany({
+            where: {
+                id: productId,
+                isActive: true,
+                stock: {
+                    gte: quantity,
+                },
+            },
+            data: {
+                stock: {
+                    decrement: quantity,
+                },
+            },
+        });
+
+        if (result.count === 0) {
+            throw new AppError(
+                "Product is out of stock or unavailable.",
+                400,
+            );
+        }
+    }
+
+    async increaseStock(tx: Prisma.TransactionClient, productId: string, quantity: number): Promise<void> {
+        const result = await tx.product.updateMany({
+            where: {
+                id: productId,
+                isActive: true,
+                stock: {
+                    gte: quantity,
+                },
+            },
+            data: {
+                stock: {
+                    increment: quantity,
+                },
             },
         });
     }

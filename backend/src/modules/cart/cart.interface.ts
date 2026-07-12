@@ -1,4 +1,4 @@
-import { Cart, CartItems } from "@prisma/client";
+import { Cart, CartItems, Prisma } from "@prisma/client";
 import { CartWithItems } from "../../types/index.js";
 
 export interface ICartRepository {
@@ -13,5 +13,5 @@ export interface ICartRepository {
     ) : Promise<CartItems>;
     updateItemQuantity(cartItemId: string, quantity: number) : Promise<CartItems>;
     removeItem(cartItemId: string) : Promise<void>;
-    clearCart(cartId: string) : Promise<void>;  
+    clearCart(tx: Prisma.TransactionClient, cartId: string) : Promise<void>;  
 }  

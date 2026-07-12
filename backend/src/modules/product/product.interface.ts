@@ -23,4 +23,14 @@ export interface IProductRepository {
     editProduct(data: Prisma.ProductUpdateInput, productId: string, sellerId: string) : Promise<Product>;
     toggleActiveProduct(productId: string, sellerId: string, isActive: boolean) : Promise<Product>;
     deleteProduct(productId: string, sellerId: string) : Promise<any>;
+    decreaseStock(
+        tx: Prisma.TransactionClient,
+        productId: string,
+        quantity: number,
+    ) : Promise<void>;
+    increaseStock(
+        tx: Prisma.TransactionClient,
+        productId: string,
+        quantity: number,
+    ) : Promise<void>;
 };

@@ -48,14 +48,21 @@ export class OrderRepository implements IOrderRepository {
     }
 
     async getOrderById(
-        orderId: string
-    ): Promise<Order | null> {
-        const order = await prisma.order.findUnique({
+        orderId: string,
+        userId: string,
+    ): Promise<OrderWithRelations | null> {
+        const order = await prisma.order.findFirst({
             where: {
                 id: orderId,
+                userId,
             },
             include: {
-                items: true,
+                items: {
+                    include: {
+                        product: true,
+                    },
+                },
+                orderAddress: true,
             },
         });
 
@@ -111,10 +118,11 @@ export class OrderRepository implements IOrderRepository {
         });
     }
     async updateOrderStatus(
+        tx: Prisma.TransactionClient,
         orderId: string, 
         status: OrderStatus
     ): Promise<Order> {
-        const updatedOrder = await prisma.order.update({
+        const updatedOrder = await tx.order.update({
             where: {
                 id: orderId,
             },

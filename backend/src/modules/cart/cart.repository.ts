@@ -1,4 +1,4 @@
-import { Cart, CartItems } from "@prisma/client";
+import { Cart, CartItems, Prisma } from "@prisma/client";
 import { ICartRepository } from "./cart.interface.js";
 import { prisma } from "../../lib/prisma.js";
 import { CartWithItems } from "../../types/index.js";
@@ -105,8 +105,8 @@ export class CartRepository implements ICartRepository {
         });
     }
 
-    async clearCart(cartId: string): Promise<void> {
-        await prisma.cartItems.deleteMany({
+    async clearCart(tx: Prisma.TransactionClient, cartId: string): Promise<void> {
+        await tx.cartItems.deleteMany({
             where: {
                 cartId,
             },

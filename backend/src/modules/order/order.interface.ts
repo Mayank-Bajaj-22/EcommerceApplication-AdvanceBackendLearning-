@@ -46,7 +46,7 @@ export interface IOrderRepository {
      * Get Single Order
      */
 
-    getOrderById(orderId: string) : Promise<Order | null>;
+    getOrderById(orderId: string, userId: string) : Promise<OrderWithRelations | null>;
 
     /**
      * Get Order With Relations
@@ -75,6 +75,7 @@ export interface IOrderRepository {
      */
 
     updateOrderStatus(
+        tx: Prisma.TransactionClient,
         orderId: string, 
         status: OrderStatus
     ) : Promise<Order>;
