@@ -2,8 +2,7 @@ import express from "express";
 import { verifyUser } from "../../middlewares/auth.middleware.js";
 import { validate } from "../../middlewares/validate.middleware.js";
 import { createAddressSchema, updateAddressSchema } from "./address.schema.js";
-import { createAddressController, getAddressesByUserIdController, updateAddressController } from "./address.controller.js";
-import { deleteCategoryController } from "../category/category.controller.js";
+import { createAddressController, deleteAddressController, getAddressesByUserIdController, updateAddressController } from "./address.controller.js";
 
 const router = express.Router();
 
@@ -20,7 +19,7 @@ router
     .patch(verifyUser, validate(updateAddressSchema), updateAddressController);
 
 router
-    .route("/delete-address")
-    .delete(verifyUser, deleteCategoryController);
+    .route("/delete-address/:addressId")
+    .delete(verifyUser, deleteAddressController);
 
 export default router;

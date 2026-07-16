@@ -9,7 +9,26 @@ export class AddressService {
     ) {}
 
     async createAddress(data: createAddressDTO, userId: string) {
+
+        // clean data
         const cleanedData = cleanCreateAddressData(data);
+
+        // address limit
+        const addressCount = await this.addressRepo.countAddressesByUserId(userId);
+
+        if (addressCount >= 5) {
+            throw new AppError("Maximum address limit reached.", 400);
+        }
+
+        // check duplicate address
+        const duplicate = await this.addressRepo.findDuplicateAddress(userId, cleanedData);
+
+        if (duplicate) {
+            throw new AppError(
+                "Address already exists.",
+                409,
+            );
+        }
 
         const createdAddress = await this.addressRepo.createAddress(cleanedData, userId);
 
@@ -22,18 +41,38 @@ export class AddressService {
         return addresses;
     }
 
-    async updateAddress(userId: string, addressId: string, data: updateAddressDTO) {
+    async updateAddress(userId: string, addressId: string, data: updateAddressDTO) {        
         const existingAddress = 
             await this.addressRepo.findByIdAndUserId(userId, addressId);
         
         if (!existingAddress) {
             throw new AppError(
-                "Address not found or you are not authorized to perform this action",
-                401,
+                "Address not found.",
+                404,
+            );
+        }
+
+        if (Object.keys(data).length === 0) {
+            throw new AppError(
+                "No fields provided for update",
+                400,
             );
         }
 
         const cleanedData = cleanUpdateAddressData(data);
+
+        const duplicate = await this.addressRepo.findDuplicateAddressForUpdate(
+            userId,
+            addressId,
+            cleanedData,
+        );
+
+        if (duplicate) {
+            throw new AppError(
+                "Another address with same details already exists.",
+                409,
+            );
+        }
 
         const updatedData = await this.addressRepo.updateAddress(
             addressId,
@@ -54,6 +93,6 @@ export class AddressService {
             );
         }
 
-        return this.addressRepo.deleteAddress(addressId);
+        await this.addressRepo.deleteAddress(addressId);
     }
 }

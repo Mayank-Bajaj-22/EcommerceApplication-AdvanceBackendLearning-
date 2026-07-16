@@ -14,4 +14,4 @@ export interface ICartRepository {
     updateItemQuantity(cartItemId: string, quantity: number) : Promise<CartItems>;
     removeItem(cartItemId: string) : Promise<void>;
     clearCart(tx: Prisma.TransactionClient, cartId: string) : Promise<void>;  
-}  
+};

@@ -12,8 +12,8 @@ export interface IAddressRepository {
      * Used during checkout to ensure the user owns the address.
      */
     findByIdAndUserId(
-        addressId: string,
         userId: string,
+        addressId: string,
         tx?: Prisma.TransactionClient
     ) : Promise<Address | null>;
 
@@ -38,5 +38,20 @@ export interface IAddressRepository {
 
     deleteAddress(
         addressId: string,
-    ) : Promise<any>;
+    ) : Promise<void>;
+
+    findDuplicateAddress(
+        userId: string,
+        data: createAddressDTO,
+    ) : Promise<Address | null>;
+
+    countAddressesByUserId(
+        userId: string,
+    ) : Promise<number>;
+
+    findDuplicateAddressForUpdate(
+        userId: string,
+        addressId: string,
+        data: updateAddressDTO,
+    ) : Promise<Address | null>;
 };

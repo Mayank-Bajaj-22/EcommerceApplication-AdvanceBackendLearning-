@@ -20,7 +20,7 @@ export class OrderService {
     async checkout(
         userId: string,
         data: CreateOrderDTO,
-    ) : Promise<OrderResponseDTO    > {
+    ) : Promise<OrderResponseDTO> {
         /**
          * Step 1
          * Validate Shipping Address
@@ -62,7 +62,7 @@ export class OrderService {
             throw new AppError(
                 "Your cart is empty.",
                 400,
-            )
+            );
         }
 
         /**

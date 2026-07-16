@@ -31,8 +31,8 @@ export class AddressRepository implements IAddressRepository {
     }
 
     async findByIdAndUserId(
-        addressId: string,
         userId: string,
+        addressId: string,
         tx?: Prisma.TransactionClient,
     ): Promise<Address | null> {
         const db = tx ?? prisma;
@@ -74,10 +74,61 @@ export class AddressRepository implements IAddressRepository {
 
     async deleteAddress(
         addressId: string
-    ): Promise<any> {
+    ): Promise<void> {
         await prisma.address.delete({
             where: {
                 id: addressId,
+            },
+        });
+    }
+
+    async countAddressesByUserId(userId: string): Promise<number> {
+        return prisma.address.count({
+            where: {
+                userId,
+            },
+        });
+    }
+
+    async findDuplicateAddress(userId: string, data: createAddressDTO): Promise<Address | null> {
+        return prisma.address.findFirst({
+            where: {
+                userId,
+                addressLine1: data.addressLine1,
+                addressLine2: data.addressLine2 ?? null,
+                city: data.city,
+                state: data.state,
+                pincode: data.pincode,
+                country: data.country,
+            },
+        });
+    }
+
+    async findDuplicateAddressForUpdate(userId: string, addressId: string, data: updateAddressDTO): Promise<Address | null> {
+        const existing = await prisma.address.findUnique({
+            where: {
+                id: addressId,
+            },
+        });
+
+        if (!existing) {
+            return null;
+        }
+
+        return prisma.address.findFirst({
+            where: {
+                userId,
+
+                NOT: {
+                    id: addressId,
+                },
+
+                addressLine1: data.addressLine1 ?? existing.addressLine1,
+                addressLine2: data.addressLine2 ?? existing.addressLine2,
+                city: data.city ?? existing.city,
+                state: data.state ?? existing.state,
+                pincode: data.pincode ?? existing.pincode,
+                country: data.country ?? existing.country,
             },
         });
     }

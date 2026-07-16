@@ -35,6 +35,8 @@ export const updateAddressController = CatchAsync(
     async (req:Request, res: Response) => {
         const userId = req.user.id;
         const addressId = req.params.addressId as string;
+        console.log(userId);
+        console.log(addressId);
 
         const result = await addressService.updateAddress(
             userId,
@@ -50,7 +52,7 @@ export const updateAddressController = CatchAsync(
     },
 );
 
-export const deleteAddress = CatchAsync(
+export const deleteAddressController = CatchAsync(
     async (req: Request, res: Response) => {
         const userId = req.user.id;
         const addressId = req.params.addressId as string;
