@@ -3,6 +3,7 @@ import { AppError } from "../../utils/AppError.js";
 import { IProductRepository } from "../product/product.interface.js";
 import { ICartRepository } from "./cart.interface.js";
 import { addToCartDTO, updateCartItemDTO } from "./cart.schema.js";
+import { prisma } from "../../lib/prisma.js";
 
 export class CartService {
     constructor (
@@ -124,6 +125,10 @@ export class CartService {
             );
         }
 
-        return await this.cartRepo.clearCart(cart.id);
+        const cartClear = await prisma.$transaction(async (tx) => {
+            await this.cartRepo.clearCart(tx, cart.id);
+        })
+
+        return cartClear;
     }
 }

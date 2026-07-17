@@ -8,6 +8,7 @@ import { prisma } from "../../lib/prisma.js";
 import { IProductRepository } from "../product/product.interface.js";
 import { toOrderResponse } from "./order.mapper.js";
 import { OrderResponseDTO } from "./order.response.js";
+import { PaginatedOrdersResponse } from "./order.pagination.js";
 
 export class OrderService {
     constructor(
@@ -28,8 +29,8 @@ export class OrderService {
         
         const address = 
             await this.addressRepo.findByIdAndUserId(
-                data.addressId,
                 userId,
+                data.addressId,
             );
 
         if (!address) {
@@ -262,16 +263,39 @@ export class OrderService {
         return orders.map(order => toOrderResponse(order));
     }
 
-    async getAllOrders() : Promise<OrderResponseDTO[]> {
-        const orders = await this.orderRepo.getAllOrders();
-
-        if (orders.length === 0) {
-            return [];
+    async getAllOrders(page: number, limit: number) : Promise<PaginatedOrdersResponse> {
+        if (page < 1) {
+            throw new AppError(
+                "Page must be greater than 0.",
+                400,
+            );
         }
 
-        return orders.map(order =>
-            toOrderResponse(order),
-        );
+        if (limit < 1 || limit > 100) {
+            throw new AppError(
+                "Limit must be between 1 and 100.",
+                400,
+            );
+        }
+
+        const totalItems = await this.orderRepo.countAllOrders();
+
+        const orders = await this.orderRepo.getAllOrders(page, limit);
+
+        return {
+            orders: orders.map(toOrderResponse),
+
+            pagination: {
+                page, 
+                limit,
+                totalItems,
+                totalPages: Math.ceil(
+                    totalItems / limit,
+                ),
+                hasNextPage: page * limit < totalItems,
+                hasPreviousPage: page > 1,
+            },
+        };
     }
 
     async updateOrderStatus(
@@ -338,6 +362,13 @@ export class OrderService {
             throw new AppError(
                 "Order not found",
                 404,
+            );
+        }
+
+        if (order.status === OrderStatus.COMPLETED) {
+            throw new AppError(
+                "Completed orders cannot be cancelled.",
+                400,
             );
         }
 

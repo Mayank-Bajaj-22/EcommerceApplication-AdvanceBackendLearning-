@@ -26,7 +26,7 @@ import categoryRouter from "./modules/category/category.route.js";
 import productRouter from "./modules/product/product.route.js";
 import addressRouter from "./modules/address/address.route.js";
 import cartRouter from "./modules/cart/cart.route.js";
-import orderRouter from "./modules/address/address.route.js";
+import orderRouter from "./modules/order/order.route.js";
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/category", categoryRouter);

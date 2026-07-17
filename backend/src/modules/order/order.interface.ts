@@ -68,7 +68,12 @@ export interface IOrderRepository {
      * Admin
      */
 
-    getAllOrders(): Promise<OrderWithRelations[]>;
+    getAllOrders(
+        page: number,
+        limit: number,
+    ): Promise<OrderWithRelations[]>;
+
+    countAllOrders() : Promise<number>;
 
     /**
      * Update Status

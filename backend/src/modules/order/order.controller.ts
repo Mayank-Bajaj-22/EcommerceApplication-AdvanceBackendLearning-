@@ -24,7 +24,7 @@ export const getMyOrderByIdController = CatchAsync(
 
         const result = await orderService.getMyOrderById(userId, orderId);
 
-        sendResponse(res, 201, {
+        sendResponse(res, 200, {
             success: true,
             message: "Order fetched successfully",
             data: result,
@@ -38,7 +38,7 @@ export const getMyOrdersController = CatchAsync(
 
         const result = await orderService.getMyOrders(userId);
 
-        sendResponse(res, 201, {
+        sendResponse(res, 200, {
             success: true,
             message: "All orders fetched successfully",
             data: result,
@@ -48,9 +48,12 @@ export const getMyOrdersController = CatchAsync(
 
 export const getAllOrdersController = CatchAsync(
     async (req: Request, res: Response) => {
-        const result = await orderService.getAllOrders();
+        const page = Number(req.query.page ?? 1);
+        const limit = Number(req.query.limit ?? 10);
 
-        sendResponse(res, 201, {
+        const result = await orderService.getAllOrders(page, limit);
+
+        sendResponse(res, 200, {
             success: true,
             message: "All orders fetched successfully",
             data: result,
@@ -64,7 +67,7 @@ export const updateOrderStatusController = CatchAsync(
 
         const result = await orderService.updateOrderStatus(orderId, req.body.status);
 
-        sendResponse(res, 201, {
+        sendResponse(res, 200, {
             success: true,
             message: "Order status updated successfully",
             data: result,

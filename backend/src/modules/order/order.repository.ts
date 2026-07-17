@@ -106,16 +106,24 @@ export class OrderRepository implements IOrderRepository {
         return orders;
     }
 
-    async getAllOrders(): Promise<OrderWithRelations[]> {
+    async getAllOrders(page: number, limit: number): Promise<OrderWithRelations[]> {
         return await prisma.order.findMany({
+            skip: (page - 1) * limit,
+            take: limit,
+
             include: {
                 items: true,
                 orderAddress: true,
             },
+
             orderBy: {
                 createdAt: "desc",
             },
         });
+    }
+
+    async countAllOrders(): Promise<number> {
+        return prisma.order.count();
     }
     async updateOrderStatus(
         tx: Prisma.TransactionClient,
