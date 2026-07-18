@@ -7,7 +7,7 @@ export const verifyUser = (req: Request, res: Response, next: NextFunction) => {
     try {
         const token =
             req.cookies?.accessToken ||
-            req.header("Authorization")?.replace("Bearer", "");
+            req.header("Authorization")?.replace(/^Bearer\s+/i, "");
 
         if (!token) {
             throw new AppError("Unautohrized request", 401);

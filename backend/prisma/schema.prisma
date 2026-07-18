@@ -41,8 +41,6 @@ model User {
   products        Product[]
   orders          Order[]
   cart            Cart?
-
-  @@index([email])
 }
 
 model RefreshToken {
@@ -52,6 +50,9 @@ model RefreshToken {
   expiresAt       DateTime
 
   user            User              @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model Address {
@@ -101,8 +102,10 @@ model Product {
   orderItems            OrderItems[]
   cartItems             CartItems[]
 
-  @@index([categoryId])
-  @@index([createdAt])
+  @@index([userId])
+  @@index([isActive])
+  @@index([categoryId, isActive])
+  @@index([categoryId, createdAt])
 }
 
 model Order {
@@ -118,7 +121,9 @@ model Order {
   items               OrderItems[]
   orderAddress        OrderAddress?
 
-  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([userId, createdAt])
 }
 
 model OrderItems {

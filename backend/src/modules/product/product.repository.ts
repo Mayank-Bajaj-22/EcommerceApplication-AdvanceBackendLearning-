@@ -112,7 +112,7 @@ export class ProductRepository implements IProductRepository {
             }
 
             if (maxPrice) {
-                where.price.gte = new Prisma.Decimal(maxPrice);
+                where.price.lte = new Prisma.Decimal(maxPrice);
             }
         }
 
